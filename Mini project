@@ -1,0 +1,458 @@
+#include<stdio.h>
+#include<conio.h>
+#include<iostream>
+#include<string.h>
+#include<fstream>
+#include<process.h>
+#define LEN 48
+
+using namespace std;
+//--------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------Introduction part i am declaring here-----------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------
+void intro(){
+    system("color 3");
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\tOnline Bus reservation\n";
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t1.Put Bus Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t2.Put Passengers Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t3.Get Bus's or Passenger's Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t4.Modify Bus's or Passenger's Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t5.Delete Bus's or Passenger's Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t6.Exit\n";
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+
+}
+
+
+void introd(){
+    system("color 6");
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\tView Bus reservation\n";
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t1.Get the Bus Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t2.Get the Passengers Details\n";
+    std::cout<<"\t\t\t\t\t\t\t\t\t3.Exit\n";
+    std::cout<<"------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+}
+
+
+//---------------------------------------------- data types-----------------------------------------------------------------------------------------------------------------
+class Bus_Reservation
+{
+  char busn[5];
+  char driver[10];
+  char arrival[5];
+  char depart[5];
+  char from[10];
+  char to[10];
+  char seat[100];
+  char pname[30];
+  char buf[LEN];
+  char timing[6];
+  void pack();
+  void unpack();
+  void packs();
+  void unpacks();
+
+public:
+  void add_bus();
+  void add_passengers();
+  void Display_Passengers_Passengers_Details();
+  void Search_Passengers_Passengers_Details();
+  void Display_Passengers_Bus_Details();
+  void Search_Bus_Passengers_Details();
+  void Delete_Passengers_Passengers_Details();
+  void Delete_Bus_Passengers_Details();
+  void Modify_Passengers_Passengers_Details();
+  void Modify_Bus_Passengers_Details();
+};
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------Bus Details--------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::pack(){
+    strcpy(buf, busn);
+    strcat(buf, "|");
+    strcat(buf, driver);
+    strcat(buf, "|");
+    strcat(buf, arrival);
+    strcat(buf, "|");
+    strcat(buf, depart);
+    strcat(buf, "|");
+    strcat(buf, from);
+    strcat(buf, "|");
+    strcat(buf, to);
+    for(int i=strlen(buf); i<LEN; i++)
+    strcat(buf, " ");
+}
+
+void Bus_Reservation::unpack(){
+    strcpy(busn, strtok(buf, "|"));
+    strcpy(driver, strtok(NULL, "|"));
+    strcpy(arrival, strtok(NULL, "|"));
+    strcpy(depart, strtok(NULL, "|"));
+    strcpy(from, strtok(NULL, "|"));
+    strcpy(to, strtok(NULL, "|"));
+}
+
+//------------------------------------------------add bus---------------------------------------------------------------------------------------------
+void Bus_Reservation::add_bus(){
+    std::cout<<"Enter Bus number\n";
+    std::cin>>busn;
+    std::cout<<"Driver name\n";
+    std::cin>>driver;
+    std::cout<<"Enter Arrival time\n";
+    std::cin>>arrival;
+    std::cout<<"Enter Departure time\n";
+    std::cin>>depart;
+    std::cout<<"Enter source\n";
+    std::cin>>from;
+    std::cout<<"Enter Destination\n";
+    std::cin>>to;
+    pack();
+    ofstream fout;
+    fout.open("Bus details.txt", ios::out|ios::app);
+    fout<<buf<<endl;
+    fout.close();
+    std::cout<<"Details added successfully\n\n\n";
+}
+
+
+//---------------------------------------------display bus------------------------------------------------------------------------------------------------
+void Bus_Reservation::Display_Passengers_Bus_Details(){
+    ifstream fin;
+    fin.open("Bus details.txt");
+    while(!fin.eof()){
+        fin>>buf;
+        if(fin.fail())
+            break;
+        unpack();
+        std::cout<<"\nBus number:-"<<busn<<"\nDriver name:-"<<driver<<"\nArrival:-"<<arrival<<"\nDeparture:-"<<depart<<"\nSource:-"<<from<<"\nDestination:-"<<to<<"\n\n\n"<<endl;
+    }
+    fin.close();
+
+}
+
+//----------------------------------------------search bus----------------------------------------------------------------------------------------------
+void Bus_Reservation::Search_Bus_Passengers_Details(){
+    ifstream fin;
+    fin.open("Bus details.txt");
+    char bus_no[20];
+    std::cout<<"Enter the Bus number\n";
+    std::cin>>bus_no;
+    while(!fin.eof()){
+        fin>>buf;
+        if(fin.fail())
+            break;
+        unpack();
+        if(!strcmp(busn, bus_no)){
+            std::cout<<"\nBus number:-"<<busn<<"\nDriver name:-"<<driver<<"\nArrival:-"<<arrival<<"\nDeparture:-"<<depart<<"\nSource:-"<<from<<"\nDestination:-"<<to<<"\n\n\n"<<endl;
+            fin.close();
+            return;
+        }
+    }
+    std::cout<<"Not found\n";
+    fin.close();;
+}
+//------------------------------------------------delete bus-----------------------------------------------------------------------------------------------------
+void Bus_Reservation::Delete_Bus_Passengers_Details(){
+      string line;
+      string name;
+      cout << "Enter the Bus number of record you want to delete: ";
+      cin >> name;
+      ifstream myfile;
+      ofstream temp;
+      myfile.open("Bus details.txt");
+      temp.open("temp.txt");
+      while (getline(myfile, line))
+      {
+        if (line != name)
+          temp << line << endl;
+      }
+      cout << "The record with the Bus number " << name << " has been deleted if it existed" << endl;
+      myfile.close();
+      temp.close();
+      remove("Bus details.txt");
+      rename("temp.txt", "Bus details.txt");
+}
+
+
+//----------------------------------------------modify bus---------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::Modify_Bus_Passengers_Details(){
+    ifstream f;
+    f.open("Bus details.txt", ios::in|ios::out);
+    char bsn[20];
+    std::cout<<"Enter the Seat number\n";
+    std::cin>>bsn;
+    while(!f.eof()){
+        f>>buf;
+        if(f.fail())
+            break;
+        unpacks();
+        if(!strcmp(busn, bsn)){
+            std::cout<<"Enter Bus number\n";
+            std::cin>>busn;
+            std::cout<<"Driver name\n";
+            std::cin>>driver;
+            std::cout<<"Enter Arrival time\n";
+            std::cin>>arrival;
+            std::cout<<"Enter Departure time\n";
+            std::cin>>depart;
+            std::cout<<"Enter source\n";
+            std::cin>>from;
+            std::cout<<"Enter Destination\n\n\n";
+            std::cin>>to;
+            packs();
+            f.seekg((int)f.tellg()-LEN, ios::beg);
+            f>>buf;
+            f.close();
+            return;
+        }
+    }
+    std::cout<<"Record not found\n\n\n";
+    f.close();
+}
+//---------------------------------------------------------------------------------------------------------------------------------------------------=------------------
+//-----------------------------------------------------Passengers Details-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::packs(){
+    strcpy(buf, busn);
+    strcat(buf, "|");
+    strcat(buf, seat);
+    strcat(buf, "|");
+    strcat(buf, pname);
+    strcat(buf, "|");
+    strcat(buf, timing);
+    for(int i=strlen(buf); i<LEN; i++)
+    strcat(buf, " ");
+}
+
+
+void Bus_Reservation::unpacks(){
+    strcpy(busn, strtok(buf, "|"));
+    strcpy(seat, strtok(NULL, "|"));
+    strcpy(pname, strtok(NULL, "|"));
+    strcpy(timing, strtok(NULL, "|"));
+}
+
+//------------------------------------------------add passengers-------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::add_passengers(){
+    std::cout<<"Enter Bus number\n";
+    std::cin>>busn;
+    std::cout<<"Enter Passenger name\n";
+    std::cin>>pname;
+    std::cout<<"Enter Seat number\n";
+    std::cin>>seat;
+    std::cout<<"Preferred Timing(IN HOURS)\n";
+    std::cin>>timing;
+    packs();
+    ofstream fout;
+    fout.open("Passengers details.txt", ios::out|ios::app);
+    fout<<buf<<endl;
+    fout.close();
+    std::cout<<"Details added successfully\n\n";
+}
+
+
+//------------------------------------------------Ddisplay passengers-------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::Display_Passengers_Passengers_Details(){
+    ifstream fin;
+    fin.open("Passengers details.txt");
+    while(!fin.eof()){
+        fin>>buf;
+        if(fin.fail())
+            break;
+        unpacks();
+        std::cout<<"\nBus number:-"<<busn<<"\nPassenger name:-"<<pname<<"\nSeat number:-"<<seat<<"\nTiming:-"<<timing<<"\n\n\n"<<endl;
+    }
+    fin.close();
+}
+
+//------------------------------------------------search passengers-------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::Search_Passengers_Passengers_Details(){
+    ifstream fin;
+    fin.open("Passengers details.txt");
+    char passengers[20];
+    std::cout<<"Enter the Passenger's name\n";
+    std::cin>>passengers;
+    while(!fin.eof()){
+        fin>>buf;
+        if(fin.fail())
+            break;
+        unpacks();
+        if(!strcmp(pname, passengers)){
+            std::cout<<"\nBus number:-"<<busn<<"\nPassenger name:-"<<pname<<"\nSeat number:-"<<seat<<"\nTiming:-"<<timing<<"\n\n\n"<<endl;
+            fin.close();
+            return;
+        }
+    }
+    std::cout<<"Not found\n";
+    fin.close();
+}
+
+//------------------------------------------------delete passengers-------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::Delete_Passengers_Passengers_Details(){
+     string line;
+      string name;
+      cout << "Enter the seat number of record you want to delete: ";
+      cin >> name;
+      ifstream myfile;
+      ofstream temp;
+      myfile.open("Bus details.txt");
+      temp.open("Passengers details.txt");
+      while (getline(myfile, line))
+      {
+        if (line != name)
+          temp << line << endl;
+      }
+      cout << "The record with the seat number " << name << " has been deleted if it existed" << endl;
+      myfile.close();
+      temp.close();
+      remove("Passengers details.txt");
+      rename("temp.txt", "Passengers details.txt");
+}
+
+
+//------------------------------------------------modify passengers-------------------------------------------------------------------------------------------------------------
+void Bus_Reservation::Modify_Passengers_Passengers_Details(){
+    ifstream f;
+    f.open("Passengers details.txt");
+    char passengers[20];
+    std::cout<<"Enter the Passenger's name\n";
+    std::cin>>passengers;
+    while(!f.eof()){
+        f>>buf;
+        if(f.fail())
+            break;
+        unpacks();
+        if(!strcmp(pname, passengers)){
+            std::cout<<"Record found\n";
+            std::cout<<"Enter Bus number\n";
+            std::cin>>busn;
+            std::cout<<"Enter Passenger name\n";
+            std::cin>>pname;
+            std::cout<<"Enter Seat number\n";
+            std::cin>>seat;
+            std::cout<<"Preferred Timing(IN HOURS)\n\n\n";
+            std::cin>>timing;
+            packs();
+            f.seekg((int)f.tellg()-LEN, ios::beg);
+            f>>buf;
+            f.close();
+            return;
+        }
+    }
+    std::cout<<"Record not found\n\n\n";
+    f.close();
+}
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------Main Class---------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int main(){
+    int ch, cho, choi, choic;
+    string pass;
+    Bus_Reservation b;
+    std::cout<<"Welcome to Portal\n";
+    while(1){
+        std::cout<<"1.Admin\n2.Passengen\n3.Exit\n";
+        std::cout<<"Enter your choice\n";
+        std::cin>>ch;
+        switch(ch){
+        case 1:
+            std::cout<<"Enter the Password\n";
+            cin>>pass;
+            if(pass=="password"){
+                intro();
+                std::cout<<"Enter your choice\n";
+                std::cin>>cho;
+                switch(cho){
+                    case 1:
+                        b.add_bus();
+                        break;
+                    case 2:
+                        std::cout<<"1467(Delhi to Bangalore)\n";
+                        std::cout<<"1576(Bnagalore to Delhi)\n";
+                        std::cout<<"3453(Banglore to Goa)\n";
+                        std::cout<<"3435(Goa to Bangalore)\n";
+                        std::cout<<"9873(Bangalore to Chennai)\n";
+                        std::cout<<"9837(Chennai to bangalore)\n";
+                        std::cout<<"Wish to enter another Bus number\n";
+                        b.add_passengers();
+                        break;
+                    case 3:
+                        std::cout<<"Whose Details want you want to see\n";
+                        std::cout<<"1.Passengers\n";
+                        std::cout<<"2.Bus\n";
+                        std::cin>>choic;
+                        switch(choic){
+                        case 1:
+                            b.Search_Passengers_Passengers_Details();
+                            break;
+                        case 2:
+                            b.Search_Bus_Passengers_Details();
+                            break;
+                        }
+                        break;
+                    case 4:
+                        std::cout<<"Whose Details want you want to modify\n";
+                        std::cout<<"1.Passengers\n";
+                        std::cout<<"2.Bus\n";
+                        std::cin>>choic;
+                        switch(choic){
+                        case 1:
+                            b.Modify_Passengers_Passengers_Details();
+                            break;
+                        case 2:
+                            b.Modify_Bus_Passengers_Details();
+                        }
+                        break;
+                    case 5:
+                        std::cout<<"Whose Details want you want to delete\n";
+                        std::cout<<"1.Passengers\n";
+                        std::cout<<"2.Bus\n";
+                        std::cin>>choic;
+                        switch(choic){
+                        case 1:
+                            b.Delete_Passengers_Passengers_Details();
+                            break;
+                        case 2:
+                            b.Search_Bus_Passengers_Details();
+                            break;
+                        }
+                        break;
+                    case 6:
+                        system("color 4");
+                        exit(0);
+                }
+            }else{
+
+                std::cout<<"Wrong password\n";
+                system("color 4");
+                exit(0);
+            }break;
+        case 2:
+            introd();
+            std::cout<<"Enter your choice\n";
+            std::cin>>choi;
+            switch(choi){
+            case 1:
+                  b.Display_Passengers_Bus_Details();
+                  break;
+            case 2:
+                b.Display_Passengers_Passengers_Details();
+                break;
+            case 3:
+                system("color 4");
+                exit(0);
+            }
+            break;
+        case 3:
+            system("color 4");
+            exit(0);
+        }
+    }
+    return 0;
+}
